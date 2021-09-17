@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "nodemon app.js",
     "start": "node app",
-    "build": "tsc --build",
     "package": "pkg app.js --out-path dist",
     "clean": "git clean -xdf",
     "oldDevOpts": "-e ts --exec \"npx ts-node ./app.ts\""
