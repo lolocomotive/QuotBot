@@ -1,0 +1,29 @@
+{
+  "name": "quot-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app",
+    "build": "tsc --build",
+    "package": "pkg app.js --out-path dist",
+    "clean": "git clean -xdf",
+    "oldDevOpts": "-e ts --exec \"npx ts-node ./app.ts\""
+  },
+  "author": "lolocomotive",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "dotenv": "^10.0.0",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^15.6.1",
+    "@types/node-fetch": "^2.5.10",
+    "@types/ws": "^7.4.4",
+    "nodemon": "^2.0.7",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.2"
+  }
+}
