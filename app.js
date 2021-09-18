@@ -2,11 +2,14 @@ const Discord = require('discord.js');
 require('dotenv').config();
 const client = new Discord.Client();
 const fs = require('fs');
-const buffer = [];
 var http = require('http');
+const buffer = new Map();
 
 http.createServer(function (req, res) {
     res.write('<h1>NodeJS Running</h1>');
+    const data = fs.readFileSync('quots.csv', 'utf8');
+    res.write('Author, Quotation<hr>');
+    res.write(data.replace(/\n/g, '<br>').replace(/"/g, ''));
     res.end();
 }).listen(parseInt(process.env.PORT));
 client.on('ready', () => {
@@ -38,36 +41,27 @@ client.on('message', async (message) => {
     for (let i in quots) {
         quotsAsCSV += '"' + authors[i] + '"' + ',"' + quots[i] + '"\n';
     }
-    buffer.push(quotsAsCSV);
     for (let i in quots) {
         const quot = quots[i];
         const author = authors[i];
         quotsAsStr += '\nCitation: `' + quot + '`\nAuteur:`' + author + '`\n';
     }
     const reply = await message.channel.send(
-        '||tempID:' +
-            (buffer.length - 1) +
-            "||\nCitation détectée! Est-ce que c'est correct comme ca?" +
+        "Citation(s) détectée(s)! Est-ce que c'est correct comme ca?" +
             quotsAsStr
     );
+    buffer.set(reply.id, quotsAsCSV);
     reply.react('✅').then(() => reply.react('❌'));
 });
 client.on('messageReactionAdd', (reaction, user) => {
     if (user.id === process.env.BOT_ID) return;
     if (reaction._emoji.name === '✅') {
         if (reaction.message.author.id === process.env.BOT_ID) {
-            var tempID = parseInt(
-                /(?!^\|\|tempID:)[0-9]+(?=|\|)/g.exec(
-                    reaction.message.content
-                )[0]
-            );
-
-            fs.appendFileSync('quots.csv', buffer[tempID]);
+            fs.appendFileSync('quots.csv', buffer.get(reaction.message.id));
             reaction.message.delete();
         }
     }
     if (reaction._emoji.name === '❌') {
-        console.log('Reaction is a ❌');
         if (reaction.message.author.id === process.env.BOT_ID) {
             reaction.message.delete();
         }
