@@ -3,6 +3,12 @@ require('dotenv').config();
 const client = new Discord.Client();
 const fs = require('fs');
 const buffer = [];
+var http = require('http');
+
+http.createServer(function (req, res) {
+    res.write('<h1>NodeJS Running</h1>');
+    res.end();
+}).listen(parseInt(process.env.PORT));
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
