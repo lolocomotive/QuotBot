@@ -96,8 +96,10 @@ client.on('message', async (message) => {
 });
 client.on('interactionCreate', (interaction) => {
     if (!interaction.isButton()) return;
-    if (interaction.customId == 'yes')
+    if (interaction.customId == 'yes') {
         fs.appendFileSync('quots.csv', buffer.get(interaction.message.id));
+        buffer.delete(interaction.message.id);
+    }
     interaction.message.delete();
 });
 client.login(process.env.TOKEN);
