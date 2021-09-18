@@ -24,13 +24,13 @@ client.on('message', async (message) => {
             /.*(?=-.*)/g
                 .exec(line)[0]
                 .trim()
-                .replaceAll(/"|»|«|„|“|”|‘|’/g, '')
+                .replace(/"|»|«|„|“|”|‘|’/g, '')
         );
         authors.push(
             /(?!.*-).*/g
                 .exec(line)[0]
                 .trim()
-                .replaceAll(/"|»|«|„|“|”|‘|’/g, '')
+                .replace(/"|»|«|„|“|”|‘|’/g, '')
         );
     }
     let quotsAsStr = '';
