@@ -7,7 +7,17 @@ const {
 } = require('discord.js');
 const fs = require('fs');
 const http = require('http');
+const { google } = require('googleapis');
+
 require('dotenv').config();
+let auth, sheets;
+async function main() {
+    auth = await google.auth.getClient({
+        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    sheets = google.sheets({ version: 'v4', auth });
+}
+main();
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
@@ -56,9 +66,9 @@ client.on('message', async (message) => {
         );
     }
     if (quots.length == 0) return;
-    let quotsAsCSV = '';
+    let quotsFinal = [];
     for (let i in quots) {
-        quotsAsCSV += '"' + authors[i] + '"' + ',"' + quots[i] + '"\n';
+        quotsFinal.push([authors[i], quots[i]]);
     }
     const row = new MessageActionRow()
         .addComponents(
@@ -92,12 +102,24 @@ client.on('message', async (message) => {
         embeds: [embed],
         components: [row],
     });
-    buffer.set(reply.id, quotsAsCSV);
+    buffer.set(reply.id, quotsFinal);
 });
-client.on('interactionCreate', (interaction) => {
+client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
     if (interaction.customId == 'yes') {
-        fs.appendFileSync('quots.csv', buffer.get(interaction.message.id));
+        //fs.appendFileSync('quots.csv', buffer.get(interaction.message.id));
+        const range = `Bot!A:B`;
+
+        const response = await sheets.spreadsheets.values.append({
+            auth,
+            spreadsheetId: process.env.SHEET_ID,
+            range,
+            valueInputOption: 'RAW',
+            insertDataOption: 'INSERT_ROWS',
+            resource: {
+                values: buffer.get(interaction.message.id),
+            },
+        });
         buffer.delete(interaction.message.id);
     }
     interaction.message.delete();
